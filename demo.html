@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit/Compare Table jQuery Plugin</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="tbl-edit-compare.css">
+</head>
+<body>
+    <div class="container">
+        <table class="table js-edit-compare" data-identifier="Table #1">
+            <tbody data-field="data-a">
+                <tr data-field="first-name">
+                    <th>First name</th>
+                    <td>John</td>
+                    <td>Jon</td>
+                </tr>
+                <tr data-field="last-name">
+                    <th>Last name</th>
+                    <td>Doe</td>
+                    <td>Doeh</td>
+                </tr>
+                <tr>
+                    <th>Home Address</th>
+                    <td>
+                        <span data-field="address-line-1">123 Main Street</span><br>
+                        <span data-field="address-line-2"></span><br>
+                        <span data-field="city">Leawood</span>, <span data-field="state">KS</span>
+                        <span data-field="zip">66211</span><br>
+                        <span data-field="country">United States</span>
+                    </td>
+                    <td>
+                        <span data-field="address-line-1">123 Main Street</span><br>
+                        <span data-field="address-line-2">Apt. 1</span><br>
+                        <span data-field="city">Leawood</span>, <span data-field="state">KS</span>
+                        <span data-field="zip">66211</span><br>
+                        <span data-field="country">United States</span>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody data-field="data-b">
+                <tr data-field="email">
+                    <th>Email Address</th>
+                    <td>some@email.com</td>
+                    <td>another@email.com</td>
+                </tr>
+            </tbody>
+        </table>
+        <p id="demo-text">Click the button below to enable editing.</p>
+        <button id="enable-demo">Warp speed, engage!</button>
+        <hr>
+        <p>The box below will contain the JSON output of what would be sent to the 'save' function on button click.</p>
+        <div class="card col-6">
+            <div class="card-body">
+                <code><pre id="output"></pre></code>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="tbl-edit-compare.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#enable-demo').click(function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                $('#demo-text, #enable-demo').hide();
+                $('.js-edit-compare').tableEditCompare({
+                    'save': function(data) {
+                        $('#output').empty().text(JSON.stringify(data, null, 4));
+                    },
+                    'dataProviders': {
+                        'state': function() {
+                            return {
+                                'KS': 'KS',
+                                'MO': 'MO',
+                                'TN': 'TN',
+                                'UT': 'UT'
+                            };
+                        },
+                        'country': function() {
+                            return {
+                                'United States': 'United States',
+                                'Canada': 'Ohhh Canada',
+                                'England': 'Jolly Old England'
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+.js-edit-compare td.selected {
+  background-color: #789d4a;
+  color: #fff;
+}
+
+.cell-inputs {
+  display: none;
+}
+
+.cell-inputs .tec-input {
+  display: block;
+  width: 100%;
+}
+
+td.editing {
+  background-color: #00d !important;
+}
+
+td.editing .cell-data {
+  display: none;
+}
+
+td.editing .cell-inputs {
+  display: block;
+}
+
+.js-edit-compare th {
+  position: relative;
+}
+
+.js-edit-compare th a {
+  cursor: pointer;
+  line-height: 1em;
+  position: absolute;
+  right: 10px;
+  text-decoration: underline !important;
+  top: 1em;
+}
+
+.field-row-edit .tec-save {
+  display: none;
+}
+
+.field-row-edit.editing .tec-edit {
+  display: none;
+}
+
+.field-row-edit.editing .tec-save {
+  display: inline;
+}
