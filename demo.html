@@ -8,6 +8,9 @@
 <body>
     <div class="container">
         <table class="table js-edit-compare" data-identifier="Table #1">
+            <thead>
+                <tr><th colspan="3">Table #1</th></tr>
+            </thead>
             <tbody data-field="data-a">
                 <tr data-field="first-name">
                     <th>First name</th>
@@ -45,9 +48,37 @@
                 </tr>
             </tbody>
         </table>
+
+        <table class="table js-edit-compare" data-identifier="Table #2">
+            <thead>
+                <tr><th colspan="3">Table #2</th></tr>
+            </thead>
+            <tbody data-field="data-c">
+                <tr data-field="field-c-1">
+                    <th>Field C1</th>
+                    <td>C4!</td>
+                    <td>Boom</td>
+                </tr>
+                <tr data-field="field-c-2">
+                    <th>Field C2</th>
+                    <td>val</td>
+                    <td>VAL</td>
+                </tr>
+            </tbody>
+            <tbody data-field="data-d">
+                <tr data-field="another-field">
+                    <th>Another Field</th>
+                    <td>It haz valyoo</td>
+                    <td>It has value</td>
+                </tr>
+            </tbody>
+        </table>
+
         <p id="demo-text">Click the button below to enable editing.</p>
         <button id="enable-demo">Warp speed, engage!</button>
+
         <hr>
+
         <p>The box below will contain the JSON output of what would be sent to the 'save' function on button click.</p>
         <div class="card col-6">
             <div class="card-body">
