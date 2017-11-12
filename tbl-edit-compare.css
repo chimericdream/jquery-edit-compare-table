@@ -1,26 +1,26 @@
-.js-edit-compare td.selected {
+.js-edit-compare td.tec-selected {
   background-color: #789d4a;
   color: #fff;
 }
 
-.cell-inputs {
+.tec-data-inputs {
   display: none;
 }
 
-.cell-inputs .tec-input {
+.tec-data-inputs .tec-input {
   display: block;
   width: 100%;
 }
 
-td.editing {
+td.tec-editing {
   background-color: #00d !important;
 }
 
-td.editing .cell-data {
+td.tec-editing .tec-data-display {
   display: none;
 }
 
-td.editing .cell-inputs {
+td.tec-editing .tec-data-inputs {
   display: block;
 }
 
@@ -37,14 +37,14 @@ td.editing .cell-inputs {
   top: 1em;
 }
 
-.field-row-edit .tec-save {
+.tec-edit-field .tec-save-link {
   display: none;
 }
 
-.field-row-edit.editing .tec-edit {
+.tec-edit-field.tec-editing .tec-edit-link {
   display: none;
 }
 
-.field-row-edit.editing .tec-save {
+.tec-edit-field.tec-editing .tec-save-link {
   display: inline;
 }

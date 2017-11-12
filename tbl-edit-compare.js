@@ -10,6 +10,18 @@
 
     var pluginName = 'tableEditCompare',
         defaults = {
+            'classes': {
+                'errorMessage': 'error',
+                'infoMessage': 'info',
+                'successMessage': 'success'
+            },
+            'strings': {
+                'doneLink': 'Done',
+                'editLink': 'Edit',
+                'selectAllButton': 'Select All',
+                'submitButton': 'Submit',
+                'unselectedFields': 'Bad! Select all the things. These were missing:'
+            },
             'save': function(data) {
                 console.dir(data);
             },
@@ -34,8 +46,8 @@
         stop(event);
         var $el = $(event.target);
 
-        $el.closest('tr').children('td').removeClass('selected');
-        $el.closest('td').addClass('selected');
+        $el.closest('tr').children('td').removeClass('tec-selected');
+        $el.closest('td').addClass('tec-selected');
     };
 
     Plugin.prototype.selectColumn = function(event) {
@@ -46,35 +58,35 @@
         var $tbody = $el.closest('tbody');
 
         $tbody.find('td.tec-data-cell')
-            .removeClass('selected');
+            .removeClass('tec-selected');
 
         $tbody.find('td.tec-data-cell:nth-of-type(' + col + ')')
-            .addClass('selected');
+            .addClass('tec-selected');
     };
 
     Plugin.prototype.toggleEditing = function(event) {
         stop(event);
 
         var $a = $(event.target).closest('a');
-        var $td = $a.closest('tr').find('td.selected');
+        var $td = $a.closest('tr').find('td.tec-selected');
         if ($td.length === 0) {
             return;
         }
 
-        if ($a.hasClass('editing')) {
+        if ($a.hasClass('tec-editing')) {
             this.updateCellText($td);
         }
 
-        $a.toggleClass('editing');
-        $td.toggleClass('editing');
+        $a.toggleClass('tec-editing');
+        $td.toggleClass('tec-editing');
     };
 
     Plugin.prototype.updateCellText = function($td) {
-        var $inputs = $td.find('.cell-inputs .tec-input');
-        var $spans = $td.find('.cell-data span[data-field]');
+        var $inputs = $td.find('.tec-data-inputs .tec-input');
+        var $spans = $td.find('.tec-data-display span[data-field]');
 
         if ($spans.length === 0) {
-            $td.find('.cell-data').text($inputs[0].value);
+            $td.find('.tec-data-display').text($inputs[0].value);
             return;
         }
 
@@ -100,7 +112,7 @@
                 if (!table.allFieldsAreSelected()) {
                     groupHasError = true;
                     table.setTableMessage(
-                        'bad! select all the things',
+                        this.options.strings.unselectedFields,
                         Plugin.MESSAGE_TYPES.ERROR
                     );
                 }
@@ -112,7 +124,7 @@
 
         if (!this.allFieldsAreSelected()) {
             this.setTableMessage(
-                'bad! select all the things',
+                this.options.strings.unselectedFields,
                 Plugin.MESSAGE_TYPES.ERROR
             );
             return;
@@ -129,18 +141,18 @@
 
     Plugin.prototype.getMessageClassByType = function(type) {
         if (typeof type === 'undefined') {
-            return 'info';
+            return this.options.classes.infoMessage;
         }
 
         switch (type) {
             case Plugin.MESSAGE_TYPES.ERROR:
-                return 'error';
+                return this.options.classes.errorMessage;
             case Plugin.MESSAGE_TYPES.SUCCESS:
-                return 'success';
+                return this.options.classes.successMessage;
             case Plugin.MESSAGE_TYPES.INFO:
-                return 'info';
+                return this.options.classes.infoMessage;
             default:
-                return 'info';
+                return this.options.classes.infoMessage;
         }
     };
 
@@ -159,7 +171,7 @@
 
     Plugin.prototype.allFieldsAreSelected = function() {
         var rowCount = this.$element.find('td.tec-data-cell').length / 2;
-        var $selected = this.$element.find('td.tec-data-cell.selected');
+        var $selected = this.$element.find('td.tec-data-cell.tec-selected');
         return (rowCount === $selected.length);
     };
 
@@ -172,7 +184,7 @@
                 data[tbodyField] = {};
             }
 
-            var $inputs = $tbody.find('td.tec-data-cell.selected .cell-inputs .tec-input');
+            var $inputs = $tbody.find('td.tec-data-cell.tec-selected .tec-data-inputs .tec-input');
             $inputs.each(function(idx, input) {
                 if (typeof tbodyField === 'undefined') {
                     data[input.name] = input.value;
@@ -217,7 +229,7 @@
                 });
             }
 
-            var $inputWrapper = $('<div class="cell-inputs"></div>');
+            var $inputWrapper = $('<div class="tec-data-inputs"></div>');
             for (var i = 0; i < fieldNames.length; i++) {
                 var $input;
                 if (this.hasDataProvider(fieldNames[i])) {
@@ -229,7 +241,7 @@
             }
 
             $td.addClass('tec-data-cell')
-                .wrapInner('<div class="cell-data"></div>')
+                .wrapInner('<div class="tec-data-display"></div>')
                 .append($inputWrapper);
         }.bind(this));
     };
@@ -271,27 +283,31 @@
     };
 
     Plugin.prototype.setupLabelCells = function($tbody) {
+        var done = this.options.strings.doneLink;
+        var edit = this.options.strings.editLink;
         $tbody.find('th').each(function(idx, th) {
-            var $child = $('<a class="field-row-edit"><span class="tec-edit">Edit</span><span class="tec-save">Done</span></a>');
+            var $child = $('<a class="tec-edit-field"><span class="tec-edit-link">' + edit + '</span><span class="tec-save-link">' + done + '</span></a>');
             $(th).append($child);
         });
     };
 
     Plugin.prototype.addButtonRows = function($tbody) {
-        var $selectAllTr = $('<tr><td>&nbsp;</td><td><button class="tec-select-all" data-column="1">Select All</button></td><td><button class="tec-select-all" data-column="2">Select All</button></td><td>&nbsp;</td></tr>');
+        var selectAll = this.options.strings.selectAllButton;
+        var $selectAllTr = $('<tr><td>&nbsp;</td><td><button class="tec-select-all" data-column="1">' + selectAll + '</button></td><td><button class="tec-select-all" data-column="2">' + selectAll + '</button></td><td>&nbsp;</td></tr>');
         $tbody.append($selectAllTr);
     };
 
     Plugin.prototype.addSaveRow = function() {
-        var $saveTr = $('<tfoot><tr><td>&nbsp;</td><td><button class="tec-save">Submit</button></td><td>&nbsp;</td><td>&nbsp;</td></tr></tfoot>');
+        var submit = this.options.strings.submitButton;
+        var $saveTr = $('<tfoot><tr><td>&nbsp;</td><td><button class="tec-save-data">' + submit + '</button></td><td>&nbsp;</td><td>&nbsp;</td></tr></tfoot>');
         this.$element.append($saveTr);
     };
 
     Plugin.prototype.addEventHandlers = function() {
         this.$element.on('click', 'td.tec-data-cell, td.tec-data-cell > *', this.selectCell);
         this.$element.on('click', 'button.tec-select-all', this.selectColumn.bind(this));
-        this.$element.on('click', '.field-row-edit', this.toggleEditing.bind(this));
-        this.$element.on('click', 'button.tec-save', this.save.bind(this));
+        this.$element.on('click', '.tec-edit-field', this.toggleEditing.bind(this));
+        this.$element.on('click', 'button.tec-save-data', this.save.bind(this));
     };
 
     Plugin.prototype.belongsToAGroup = function() {
