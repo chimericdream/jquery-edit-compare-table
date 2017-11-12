@@ -90,35 +90,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="tbl-edit-compare.js"></script>
     <script>
-        $(document).ready(function() {
-            $('#enable-demo').click(function(event) {
-                event.preventDefault();
-                event.stopPropagation();
-                $('#demo-text, #enable-demo').hide();
-                $('.js-edit-compare').tableEditCompare({
-                    'save': function(data) {
-                        $('#output').empty().text(JSON.stringify(data, null, 4));
-                    },
-                    'dataProviders': {
-                        'state': function() {
-                            return {
-                                'KS': 'KS',
-                                'MO': 'MO',
-                                'TN': 'TN',
-                                'UT': 'UT'
-                            };
+        (function($) {
+            $(document).ready(function() {
+                $('#enable-demo').click(function(event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    $('#demo-text, #enable-demo').hide();
+                    $('.js-edit-compare').tableEditCompare({
+                        'save': function(data) {
+                            $('#output').empty().text(JSON.stringify(data, null, 4));
                         },
-                        'country': function() {
-                            return {
-                                'United States': 'United States',
-                                'Canada': 'Ohhh Canada',
-                                'England': 'Jolly Old England'
+                        'dataProviders': {
+                            'state': function() {
+                                return {
+                                    'KS': 'KS',
+                                    'MO': 'MO',
+                                    'TN': 'TN',
+                                    'UT': 'UT'
+                                };
+                            },
+                            'country': function() {
+                                return {
+                                    'United States': 'United States',
+                                    'Canada': 'Ohhh Canada',
+                                    'England': 'Jolly Old England'
+                                }
                             }
                         }
-                    }
+                    });
                 });
             });
-        });
+        })(jQuery);
     </script>
 </body>
 </html>

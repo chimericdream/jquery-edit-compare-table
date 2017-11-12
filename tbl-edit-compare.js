@@ -1,22 +1,34 @@
 ;(function($) {
     'use strict';
 
+    function stop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    var TABLES = [];
+
     var pluginName = 'tableEditCompare',
         defaults = {
             'save': function(data) {
                 console.dir(data);
             },
-            'dataProviders': {}
+            'dataProviders': {},
+            'dataValidators': {}
         };
 
     function Plugin(element, options) {
         this.options    = $.extend({}, defaults, options);
-        this._defaults  = defaults;
-        this._name      = pluginName;
-
         this.$element   = $(element);
+        this.identifier = this.$element.data('identifier');
         this.init();
     }
+
+    Plugin.MESSAGE_TYPES = {
+        'ERROR': 0,
+        'INFO': 1,
+        'SUCCESS': 2
+    };
 
     Plugin.prototype.selectCell = function(event) {
         stop(event);
@@ -74,13 +86,84 @@
     Plugin.prototype.save = function(event) {
         stop(event);
 
-        var rowCount = this.$element.find('td.tec-data-cell').length / 2;
-        var $selected = this.$element.find('td.tec-data-cell.selected');
-        if (rowCount !== $selected.length) {
-            alert('bad! select all the things');
+        this.clearTableMessages();
+
+        var data = this.getData();
+        if (this.belongsToAGroup()) {
+            var groupHasError = false;
+            data = {};
+            for (var i = 0; i < TABLES.length; i++) {
+                var table = TABLES[i];
+                table.clearTableMessages();
+
+                data[table.identifier] = table.getData();
+                if (!table.allFieldsAreSelected()) {
+                    groupHasError = true;
+                    table.setTableMessage(
+                        'bad! select all the things',
+                        Plugin.MESSAGE_TYPES.ERROR
+                    );
+                }
+            }
+            if (groupHasError) {
+                return;
+            }
+        }
+
+        if (!this.allFieldsAreSelected()) {
+            this.setTableMessage(
+                'bad! select all the things',
+                Plugin.MESSAGE_TYPES.ERROR
+            );
             return;
         }
 
+        if (typeof this.options.save === 'function') {
+            this.options.save(data);
+        }
+    };
+
+    Plugin.prototype.clearTableMessages = function() {
+        this.$element.find('.tec-error-message').remove();
+    };
+
+    Plugin.prototype.getMessageClassByType = function(type) {
+        if (typeof type === 'undefined') {
+            return 'info';
+        }
+
+        switch (type) {
+            case Plugin.MESSAGE_TYPES.ERROR:
+                return 'error';
+            case Plugin.MESSAGE_TYPES.SUCCESS:
+                return 'success';
+            case Plugin.MESSAGE_TYPES.INFO:
+                return 'info';
+            default:
+                return 'info';
+        }
+    };
+
+    Plugin.prototype.setTableMessage = function(message, type) {
+        var msgClass = this.getMessageClassByType(type);
+        var $errBody = $('<tbody class="tec-error-message"><tr class="' + msgClass + '"><th colspan="3">' + message + '</th></tr></tbody>').hide();
+        this.$element.prepend($errBody);
+        $errBody.slideDown();
+    };
+
+    Plugin.prototype.setFieldMessage = function(field, message, type) {
+        if (typeof type === 'undefined') {
+            type = Plugin.MESSAGE_TYPES.INFO;
+        }
+    };
+
+    Plugin.prototype.allFieldsAreSelected = function() {
+        var rowCount = this.$element.find('td.tec-data-cell').length / 2;
+        var $selected = this.$element.find('td.tec-data-cell.selected');
+        return (rowCount === $selected.length);
+    };
+
+    Plugin.prototype.getData = function() {
         var data = {};
         this.$element.children('tbody').each(function(idx, tbody) {
             var $tbody = $(tbody);
@@ -98,10 +181,7 @@
                 }
             });
         });
-
-        if (typeof this.options.save === 'function') {
-            this.options.save(data);
-        }
+        return data;
     };
 
     Plugin.prototype.init = function() {
@@ -113,6 +193,7 @@
 
         this.addSaveRow();
         this.addEventHandlers();
+        this.setupGrouping();
     };
 
     Plugin.prototype.setupDataCells = function($tbody) {
@@ -213,10 +294,22 @@
         this.$element.on('click', 'button.tec-save', this.save.bind(this));
     };
 
-    function stop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-    }
+    Plugin.prototype.belongsToAGroup = function() {
+        return (typeof this.identifier !== 'undefined');
+    };
+
+    Plugin.prototype.setupGrouping = function() {
+        if (this.belongsToAGroup()) {
+            TABLES.push(this);
+            if (TABLES.length > 1) {
+                TABLES[(TABLES.length - 2)].removeSaveButton();
+            }
+        }
+    };
+
+    Plugin.prototype.removeSaveButton = function() {
+        this.$element.children('tfoot').remove();
+    };
 
     $.fn.tableEditCompare = function(options) {
         return this.each(function() {
