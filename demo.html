@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="container">
-        <table class="table js-edit-compare" data-identifier="Table #1">
+        <table class="table js-edit-compare" data-group="group-1" data-identifier="Table #1">
             <thead>
                 <tr><th colspan="3">Table #1</th></tr>
             </thead>
@@ -49,7 +49,7 @@
             </tbody>
         </table>
 
-        <table class="table js-edit-compare" data-identifier="Table #2">
+        <table class="table js-edit-compare" data-group="group-1" data-identifier="Table #2">
             <thead>
                 <tr><th colspan="3">Table #2</th></tr>
             </thead>
@@ -74,9 +74,6 @@
             </tbody>
         </table>
 
-        <p id="demo-text">Click the button below to enable editing.</p>
-        <button id="enable-demo">Warp speed, engage!</button>
-
         <hr>
 
         <p>The box below will contain the JSON output of what would be sent to the 'save' function on button click.</p>
@@ -90,34 +87,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="tbl-edit-compare.js"></script>
     <script>
+        /* global jQuery */
         (function($) {
+            'use strict';
             $(document).ready(function() {
-                $('#enable-demo').click(function(event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    $('#demo-text, #enable-demo').hide();
-                    $('.js-edit-compare').tableEditCompare({
-                        'save': function(data) {
-                            $('#output').empty().text(JSON.stringify(data, null, 4));
+                $('.js-edit-compare').tableEditCompare({
+                    'save': function(data) {
+                        $('#output').empty().text(JSON.stringify(data, null, 4));
+                    },
+                    'dataProviders': {
+                        'state': function() {
+                            return {
+                                'KS': 'KS',
+                                'MO': 'MO',
+                                'TN': 'TN',
+                                'UT': 'UT'
+                            };
                         },
-                        'dataProviders': {
-                            'state': function() {
-                                return {
-                                    'KS': 'KS',
-                                    'MO': 'MO',
-                                    'TN': 'TN',
-                                    'UT': 'UT'
-                                };
-                            },
-                            'country': function() {
-                                return {
-                                    'United States': 'United States',
-                                    'Canada': 'Ohhh Canada',
-                                    'England': 'Jolly Old England'
-                                }
+                        'country': function() {
+                            return {
+                                'United States': 'United States',
+                                'Canada': 'Ohhh Canada',
+                                'England': 'Jolly Old England'
                             }
                         }
-                    });
+                    }
                 });
             });
         })(jQuery);

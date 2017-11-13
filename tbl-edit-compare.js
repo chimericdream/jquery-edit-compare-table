@@ -1,3 +1,4 @@
+/* global jQuery */
 ;(function($) {
     'use strict';
 
@@ -6,7 +7,7 @@
         event.stopPropagation();
     }
 
-    var TABLES = [];
+    var GROUPED_TABLES = {};
 
     var pluginName = 'tableEditCompare',
         defaults = {
@@ -32,6 +33,7 @@
     function Plugin(element, options) {
         this.options    = $.extend({}, defaults, options);
         this.$element   = $(element);
+        this.group      = this.$element.data('group');
         this.identifier = this.$element.data('identifier');
         this.init();
     }
@@ -104,8 +106,8 @@
         if (this.belongsToAGroup()) {
             var groupHasError = false;
             data = {};
-            for (var i = 0; i < TABLES.length; i++) {
-                var table = TABLES[i];
+            for (var i = 0; i < GROUPED_TABLES[this.group].length; i++) {
+                var table = GROUPED_TABLES[this.group][i];
                 table.clearTableMessages();
 
                 data[table.identifier] = table.getData();
@@ -311,14 +313,15 @@
     };
 
     Plugin.prototype.belongsToAGroup = function() {
-        return (typeof this.identifier !== 'undefined');
+        return (typeof this.group !== 'undefined');
     };
 
     Plugin.prototype.setupGrouping = function() {
         if (this.belongsToAGroup()) {
-            TABLES.push(this);
-            if (TABLES.length > 1) {
-                TABLES[(TABLES.length - 2)].removeSaveButton();
+            GROUPED_TABLES[this.group] = GROUPED_TABLES[this.group] || [];
+            GROUPED_TABLES[this.group].push(this);
+            if (GROUPED_TABLES[this.group].length > 1) {
+                GROUPED_TABLES[this.group][(GROUPED_TABLES[this.group].length - 2)].removeSaveButton();
             }
         }
     };
